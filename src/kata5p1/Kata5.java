@@ -2,15 +2,19 @@ package kata5p1;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 public class Kata5 {
     public static void main(String[] args) {
-        Kata5 easy = new Kata5();
-        crearTabla();
-        easy.selectAll();
+        Kata5 kata5 = new Kata5();
+        String ficheroEmail = "email.txt";
+        List<String> listaCorreos = MailListReader.read(ficheroEmail);
+        kata5.insertData(listaCorreos);
+        kata5.selectAll();
     }
     
     private Connection connect(){
@@ -26,6 +30,18 @@ public class Kata5 {
         return conexion;
     }
     
+    public void insertData(List<String> emails) {
+        String sql = "INSERT INTO EMAIL(Mail) VALUES(?)";
+        try (Connection conexion = connect();
+                PreparedStatement pst = conexion.prepareStatement(sql)){
+            for (String email : emails) {
+                pst.setString(1, email);
+                pst.executeUpdate();
+            }
+        } catch (SQLException e1){
+            System.out.println(e1.getMessage());
+        }
+    }
     public void selectAll() {
         String sql = "SELECT * FROM EMAIL";
         
